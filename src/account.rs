@@ -7,7 +7,7 @@ use std::ops;
 pub struct Account(pub Vec<Asset>);
 
 impl Account {
-    pub fn exchange(buyer: Account, seller: Account) -> (Account, Account) {
+    pub fn exchange(rate: &Rate, buyer: &Account, seller: &Account) -> (Account, Account) {
         let b = buyer.clone();
         let s = seller.clone();
         (b, s)

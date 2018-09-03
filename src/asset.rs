@@ -33,11 +33,14 @@ pub struct LifeTime();
 pub struct Quantity(pub i32);
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
-pub enum Asset {
-    Resource(Resource, Quantity),
-    State(State, Quantity),
-    LifeTime(LifeTime, Quantity),
+pub enum Item {
+    Resource(Resource),
+    State(State),
+    LifeTime(LifeTime),
 }
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
+pub struct Asset(pub Item, pub Quantity);
 
 impl Asset {
     pub fn op<F>(lhs: &Asset, rhs: &Asset, op: F) -> Option<Asset>
@@ -45,25 +48,14 @@ impl Asset {
         F: Fn(Quantity, Quantity) -> Quantity,
     {
         match (lhs, rhs) {
-            (Asset::Resource(lhs_resource, lhs_quantity), Asset::Resource(rhs_resource, rhs_quantity))
-                if lhs_resource == rhs_resource =>
+            (Asset(lhs_item, lhs_quantity), Asset(rhs_item, rhs_quantity))
+                if lhs_item == rhs_item =>
             {
-                Some(Asset::Resource(
-                    lhs_resource.clone(),
+                Some(Asset(
+                    lhs_item.clone(),
                     op(lhs_quantity.clone(), rhs_quantity.clone()),
                 ))
             }
-            (Asset::State(lhs_state, lhs_quantity), Asset::State(rhs_state, rhs_quantity))
-                if lhs_state == rhs_state =>
-            {
-                Some(Asset::State(
-                    lhs_state.clone(),
-                    op(lhs_quantity.clone(), rhs_quantity.clone()),
-                ))
-            }
-            (Asset::LifeTime(_, lhs_quantity), Asset::LifeTime(_, rhs_quantity)) => Some(
-                Asset::LifeTime(LifeTime(), op(lhs_quantity.clone(), rhs_quantity.clone())),
-            ),
             _ => None,
         }
     }
