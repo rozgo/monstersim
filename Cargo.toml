@@ -1,0 +1,17 @@
+[package]
+name = "monstersim"
+version = "0.1.0"
+authors = ["Alex Rozgo <alex.rozgo@gmail.com>"]
+
+[dependencies]
+time = "0.1"
+termion = "1.5.1"
+tui = "0.2.3"
+
+[lib]
+name = "monstersim"
+path = "src/lib.rs"
+
+[[bin]]
+name = "monstersim"
+path = "src/bin.rs"
