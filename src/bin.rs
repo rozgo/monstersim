@@ -16,61 +16,6 @@ use tui::style::{Color, Modifier, Style};
 use tui::widgets::{Block, Borders, Gauge, Widget};
 use tui::Terminal;
 
-// use monstersim::*;
-
-// use monstersim::asset::*;
-// use monstersim::rate::*;
-// use monstersim::account::*;
-
-// use monstersim::monster::*;
-
-// fn main2() {
-//     let house = Account(vec![
-//         Asset::LifeTime(LifeTime(), Quantity(i32::max_value())),
-//         Asset::LifeTime(LifeTime(), Quantity(i32::max_value())),
-//     ]);
-
-//     let monster = Account(vec![
-//         Asset::State(State::Health, Quantity(10000)),
-//         Asset::State(State::Hunger, Quantity(10000)),
-//         Asset::State(State::Energy, Quantity(10000)),
-//         Asset::State(State::Cleanliness, Quantity(10000)),
-//     ]);
-
-//     let rates = vec![
-//         Rate {
-//             credit: vec![Asset::LifeTime(LifeTime(), Quantity(1))],
-//             debit: vec![
-//                 Asset::State(State::Energy, Quantity(9)),
-//                 Asset::State(State::Hunger, Quantity(3)),
-//                 Asset::State(State::Cleanliness, Quantity(1)),
-//             ],
-//         },
-//         Rate {
-//             credit: vec![Asset::LifeTime(LifeTime(), Quantity(1))],
-//             debit: vec![Asset::State(State::Health, Quantity(1))],
-//         },
-//         Rate {
-//             credit: vec![Asset::State(State::Health, Quantity(100))],
-//             debit: vec![Asset::Resource(Resource::FirstAid, Quantity(1))],
-//         },
-//         Rate {
-//             credit: vec![Asset::State(State::Hunger, Quantity(100))],
-//             debit: vec![Asset::Resource(Resource::Candy, Quantity(1))],
-//         },
-//         Rate {
-//             credit: vec![Asset::State(State::Energy, Quantity(100))],
-//             debit: vec![Asset::Resource(Resource::EnergyDrink, Quantity(1))],
-//         },
-//         Rate {
-//             credit: vec![Asset::State(State::Cleanliness, Quantity(100))],
-//             debit: vec![Asset::Resource(Resource::Soap, Quantity(1))],
-//         },
-//     ];
-
-//     println!("{:?}", rates);
-// }
-
 struct App {
     size: Rect,
     progress1: u16,
@@ -116,8 +61,6 @@ enum Event {
 }
 
 fn main() {
-    // main2();
-    // return;
     // Terminal initialization
     let backend = MouseBackend::new().unwrap();
     let mut terminal = Terminal::new(backend).unwrap();

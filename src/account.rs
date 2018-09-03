@@ -1,57 +1,45 @@
 use asset::*;
 use rate::*;
-use std::cmp;
 use std::ops;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
-pub struct Account(pub Vec<Asset>);
+pub struct Account(pub HashMap<Asset, Quantity>);
 
 impl Account {
-    pub fn exchange(rate: &Rate, buyer: &Account, seller: &Account) -> (Account, Account) {
-        let b = buyer.clone();
-        let s = seller.clone();
-        (b, s)
+
+    pub fn exchange(rate: &Rate, quantity: Quantity, buyer: &Account, seller: &Account) -> (Account, Account) {
+        let credit = Account(rate.credit.clone());
+        let debit = Account(rate.debit.clone());
+        (&(buyer - &debit) + &credit, &(seller - &credit) + &debit)
     }
 
     pub fn prime(&mut self, rhs: &Account) {
+        let Account(lhs) = self;
         let Account(rhs) = rhs;
-        for rhs_asset in rhs {
-            let mut found_asset = None;
-            {
-                let Account(lhs) = &*self;
-                for lhs_asset in lhs {
-                    if let Some(asset) = lhs_asset + rhs_asset {
-                        found_asset = Some(asset);
-                        continue;
-                    }
-                }
+        for rhs_key in rhs.keys() {
+            if !lhs.contains_key(rhs_key) {
+                lhs.insert(rhs_key.clone(), Quantity(0));
             }
-            let Account(acc) = self;
-            match found_asset {
-                Some(_) => (),
-                _ => acc.push(Asset::op(rhs_asset, rhs_asset, |_, _| Quantity(0)).unwrap()),
-            };
         }
     }
 
     pub fn op<F>(lhs: &Account, rhs: &Account, op: F) -> Account
     where
-        F: Fn(&Asset, &Asset) -> Option<Asset>,
+        F: Fn(&Quantity, &Quantity) -> Quantity,
     {
-        let acc = &mut vec![];
+        let mut acc = hashmap![];
         let lhs = &mut lhs.clone();
         let rhs = &mut rhs.clone();
         lhs.prime(rhs);
         rhs.prime(lhs);
         let Account(lhs) = &*lhs;
         let Account(rhs) = &*rhs;
-        for lhs_asset in lhs {
-            for rhs_asset in rhs {
-                let diff_asset = op(lhs_asset, rhs_asset);
-                if let Some(diff_asset) = diff_asset {
-                    acc.push(diff_asset)
-                }
-            }
+        for key in lhs.keys() {
+            let lhs_quantity = lhs.get(key).unwrap();
+            let rhs_quantity = rhs.get(key).unwrap();
+            let quantity = op(lhs_quantity, rhs_quantity);
+            acc.insert(key.clone(), quantity.clone());
         }
         Account(acc.clone())
     }
@@ -65,8 +53,6 @@ impl PartialEq for Account {
         rhs.prime(lhs);
         let Account(lhs) = lhs;
         let Account(rhs) = rhs;
-        lhs.sort_by(|ref a, ref b| a.partial_cmp(&b).unwrap());
-        rhs.sort_by(|ref a, ref b| a.partial_cmp(&b).unwrap());
         lhs == rhs
     }
 }
@@ -75,7 +61,7 @@ impl<'a, 'b> ops::Add<&'a Account> for &'b Account {
     type Output = Account;
 
     fn add(self, rhs: &Account) -> Account {
-        Account::op(self, rhs, |la, ra| la + ra)
+        Account::op(self, rhs, |Quantity(lq), Quantity(rq)| Quantity(lq + rq))
     }
 }
 
@@ -83,6 +69,7 @@ impl<'a, 'b> ops::Sub<&'a Account> for &'b Account {
     type Output = Account;
 
     fn sub(self, rhs: &Account) -> Account {
-        Account::op(self, rhs, |la, ra| la - ra)
+        Account::op(self, rhs, |Quantity(lq), Quantity(rq)| Quantity(lq - rq))
     }
 }
+
