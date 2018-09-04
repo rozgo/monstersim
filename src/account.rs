@@ -3,14 +3,17 @@ use rate::*;
 use std::ops;
 use std::collections::HashMap;
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone, Copy)]
+pub struct Quantity(pub i32);
+
 #[derive(Debug, Clone)]
 pub struct Account(pub HashMap<Asset, Quantity>);
 
 impl Account {
 
     pub fn exchange(rate: &Rate, quantity: Quantity, buyer: &Account, seller: &Account) -> (Account, Account) {
-        let credit = Account(rate.credit.clone());
-        let debit = Account(rate.debit.clone());
+        let credit = &Account(rate.credit.clone()) * quantity;
+        let debit = &Account(rate.debit.clone()) * quantity;
         (&(buyer - &debit) + &credit, &(seller - &credit) + &debit)
     }
 
@@ -72,4 +75,22 @@ impl<'a, 'b> ops::Sub<&'a Account> for &'b Account {
         Account::op(self, rhs, |Quantity(lq), Quantity(rq)| Quantity(lq - rq))
     }
 }
+
+impl<'a, 'b> ops::Mul<Quantity> for &'b Account {
+    type Output = Account;
+
+    fn mul(self, rhs: Quantity) -> Account {
+        let Account(lhs) = self;
+        let keys = lhs.keys();
+        let lhs = &mut lhs.clone();
+        let Quantity(rhs_quantity) = rhs;
+        for key in keys {
+            let q = lhs.entry(key.clone()).or_insert(Quantity(0));
+            let Quantity(lhs_quantity) = *q;
+            *q = Quantity(lhs_quantity * rhs_quantity);
+        }
+        Account(lhs.clone())
+    }
+}
+
 

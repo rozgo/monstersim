@@ -29,9 +29,6 @@ pub enum State {
 pub struct LifeTime();
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone)]
-pub struct Quantity(pub i32);
-
-#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone)]
 pub enum Asset {
     Resource(Resource),
     State(State),

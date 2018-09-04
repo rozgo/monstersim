@@ -1,8 +1,8 @@
 extern crate monstersim;
 
-use account::*;
-use asset::*;
 use monstersim::*;
+use asset::*;
+use account::*;
 use rate::*;
 
 fn house_default() -> Account {
@@ -73,6 +73,32 @@ fn rate_buy_lifetime() {
         Asset::State(State::Hunger) => Quantity(9997),
         Asset::State(State::Energy) => Quantity(9991),
         Asset::State(State::Cleanliness) => Quantity(9999),
+    ]);
+
+    assert_eq!(res_seller, seller);
+    assert_eq!(res_buyer, buyer);
+}
+
+#[test]
+fn rate_buy_lifetime_quantity() {
+    let house = house_default();
+    let monster = monster_default();
+    let rates = rates_default();
+    let (buyer, seller) = Account::exchange(&rates[0], Quantity(2), &monster, &house);
+
+    let res_seller = Account(hashmap![
+        Asset::LifeTime(LifeTime()) => Quantity(999998),
+        Asset::State(State::Hunger) => Quantity(6),
+        Asset::State(State::Energy) => Quantity(18),
+        Asset::State(State::Cleanliness) => Quantity(2),
+    ]);
+
+    let res_buyer = Account(hashmap![
+        Asset::LifeTime(LifeTime()) => Quantity(2),
+        Asset::State(State::Health) => Quantity(10000),
+        Asset::State(State::Hunger) => Quantity(9994),
+        Asset::State(State::Energy) => Quantity(9982),
+        Asset::State(State::Cleanliness) => Quantity(9998),
     ]);
 
     assert_eq!(res_seller, seller);
