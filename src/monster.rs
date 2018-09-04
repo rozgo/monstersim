@@ -1,38 +1,23 @@
-use game::*;
-use std::time::{Duration, Instant};
+use asset::*;
+use account::*;
+use rate::*;
 
-// #[derive(Debug, PartialEq, Eq)]
-// pub struct Monster {
-//     // pub dob: Instant,
-//     // pub lifetime: LifeTime,
-//     // pub action: Action,
-//     // pub states: States,
-//     // pub resources: Resources,
-// }
+pub struct Monster {
+    pub account: Account,
+    pub is_alive: bool,
+}
 
-// impl Monster {
-//     pub fn create_basic() -> Monster {
-//         Monster {
-//             // dob: Instant::now(),
-//             // lifetime: LifeTime(0),
-//             // action: Action::Sleep,
-//             // resources: map!{
-//             //     Resource::FirstAid => 1000,
-//             //     Resource::Soap => 1000,
-//             //     Resource::Candy => 1000,
-//             //     Resource::EnergyDrink => 1000
-//             // },
-//             // states: map!{
-//             //     State::Health => u32::max_value(),
-//             //     State::Energy => u32::max_value(),
-//             //     State::Happiness => u32::max_value(),
-//             //     State::Cleanliness => u32::max_value()
-//             // },
-//         }
-//     }
-
-//     pub fn simulate(&mut self) {
-//         // self.currencies.contains_key(k: &Q)
-//     }
-// }
+impl Monster {
+    pub fn simulate(&mut self, rates: &Vec<Rate>, house: &Account) {
+        let Quantity(lifetime_before) = self.account.map().get(&Asset::LifeTime).unwrap().clone();
+        for rate in rates {
+            let (buyer, _) = Account::exchange(rate, Quantity(1), &self.account, house);
+            self.account = buyer;
+        }
+        let Quantity(lifetime_after) = self.account.map().get(&Asset::LifeTime).unwrap().clone();
+        if lifetime_after <= lifetime_before {
+            self.is_alive = false;
+        }
+    }
+}
 

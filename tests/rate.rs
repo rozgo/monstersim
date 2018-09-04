@@ -7,7 +7,7 @@ use rate::*;
 
 fn house_default() -> Account {
     Account(hashmap![
-        Asset::LifeTime(LifeTime()) => Quantity(1000000),
+        Asset::LifeTime => Quantity(1000000),
     ])
 }
 
@@ -23,7 +23,7 @@ fn monster_default() -> Account {
 fn rates_default() -> Vec<Rate> {
     vec![
         Rate {
-            credit: hashmap![Asset::LifeTime(LifeTime()) => Quantity(1)],
+            credit: hashmap![Asset::LifeTime => Quantity(1)],
             debit: hashmap![
                 Asset::State(State::Energy) => Quantity(9),
                 Asset::State(State::Hunger) => Quantity(3),
@@ -31,7 +31,7 @@ fn rates_default() -> Vec<Rate> {
             ],
         },
         Rate {
-            credit: hashmap![Asset::LifeTime(LifeTime()) => Quantity(1)],
+            credit: hashmap![Asset::LifeTime => Quantity(1)],
             debit: hashmap![Asset::State(State::Health) => Quantity(1)],
         },
         Rate {
@@ -61,14 +61,14 @@ fn rate_buy_lifetime() {
     let (buyer, seller) = Account::exchange(&rates[0], Quantity(1), &monster, &house);
 
     let res_seller = Account(hashmap![
-        Asset::LifeTime(LifeTime()) => Quantity(999999),
+        Asset::LifeTime => Quantity(999999),
         Asset::State(State::Hunger) => Quantity(3),
         Asset::State(State::Energy) => Quantity(9),
         Asset::State(State::Cleanliness) => Quantity(1),
     ]);
 
     let res_buyer = Account(hashmap![
-        Asset::LifeTime(LifeTime()) => Quantity(1),
+        Asset::LifeTime => Quantity(1),
         Asset::State(State::Health) => Quantity(10000),
         Asset::State(State::Hunger) => Quantity(9997),
         Asset::State(State::Energy) => Quantity(9991),
@@ -87,14 +87,14 @@ fn rate_buy_lifetime_quantity() {
     let (buyer, seller) = Account::exchange(&rates[0], Quantity(2), &monster, &house);
 
     let res_seller = Account(hashmap![
-        Asset::LifeTime(LifeTime()) => Quantity(999998),
+        Asset::LifeTime => Quantity(999998),
         Asset::State(State::Hunger) => Quantity(6),
         Asset::State(State::Energy) => Quantity(18),
         Asset::State(State::Cleanliness) => Quantity(2),
     ]);
 
     let res_buyer = Account(hashmap![
-        Asset::LifeTime(LifeTime()) => Quantity(2),
+        Asset::LifeTime => Quantity(2),
         Asset::State(State::Health) => Quantity(10000),
         Asset::State(State::Hunger) => Quantity(9994),
         Asset::State(State::Energy) => Quantity(9982),

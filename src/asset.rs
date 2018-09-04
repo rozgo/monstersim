@@ -1,3 +1,4 @@
+use std::time::{Duration, Instant};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone)]
 pub enum Resource {
@@ -26,11 +27,9 @@ pub enum State {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone)]
-pub struct LifeTime();
-
-#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone)]
 pub enum Asset {
     Resource(Resource),
     State(State),
-    LifeTime(LifeTime),
+    LifeTime,
+    BirthCertificate(Instant),
 }
