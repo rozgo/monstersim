@@ -6,12 +6,16 @@ The end goal is to optimize for provably fair behavioral economics design.
 ## Requirements:
 - Install Rust [https://rustup.rs](https://rustup.rs)
 ```
-curl https://sh.rustup.rs -sSf | sh
+$ curl https://sh.rustup.rs -sSf | sh
+```
+Set default Rust to **nightly** (for latest features):
+```
+$ rustup default nightly
 ```
 
 ## Run tests:
 ```
-cargo test -- --nocapture
+$ cargo test -- --nocapture
 ```
 
 If everything worked you should see test results like this:
