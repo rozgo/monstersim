@@ -58,7 +58,7 @@ fn monster_lifetime_until_death() {
         monster.simulate(&rates, &house);
     }
 
-    let Quantity(total_secs) = monster.account.map().get(&Asset::LifeTime).unwrap().clone();
+    let Quantity(total_secs) = monster.account.quantity(&Asset::LifeTime);
 
     let hours = (total_secs / 60) / 60;
     let mins = (total_secs - hours * 60 * 60) / 60;

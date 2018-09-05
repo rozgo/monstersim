@@ -15,9 +15,11 @@ pub enum Tranx {
 }
 
 impl Account {
-    pub fn map(&self) -> &HashMap<Asset, Quantity> {
-        let Account(map) = self;
-        map
+    pub fn quantity(&self, asset: &Asset) -> Quantity {
+        match self.0.get(asset) {
+            Some(quantity) => quantity.clone(),
+            None => Quantity(0),
+        }
     }
 
     pub fn exchange(rate: &Rate, quantity: Quantity, buyer: &Account, seller: &Account) -> Tranx {
@@ -46,7 +48,12 @@ impl Account {
         }
     }
 
-    pub fn prime(&mut self, rhs: &Account) {
+    pub fn map(&self) -> &HashMap<Asset, Quantity> {
+        let Account(map) = self;
+        map
+    }
+
+    fn prime(&mut self, rhs: &Account) {
         let Account(lhs) = self;
         let Account(rhs) = rhs;
         for rhs_key in rhs.keys() {
@@ -56,7 +63,7 @@ impl Account {
         }
     }
 
-    pub fn op<F>(lhs: &Account, rhs: &Account, op: F) -> Account
+    fn op<F>(lhs: &Account, rhs: &Account, op: F) -> Account
     where
         F: Fn(&Quantity, &Quantity) -> Quantity,
     {
