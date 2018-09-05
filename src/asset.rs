@@ -1,6 +1,6 @@
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone, Copy)]
 pub enum Resource {
     FirstAid,
     Soap,
@@ -17,7 +17,7 @@ pub enum Action {
     Train,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone, Copy)]
 pub enum State {
     Health,
     Hunger,
@@ -26,10 +26,16 @@ pub enum State {
     Cleanliness,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone, Copy)]
 pub enum Asset {
     Resource(Resource),
     State(State),
     LifeTime,
     BirthCertificate(Instant),
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub enum Exchange {
+    LifeTimeForState,
+    LifeTimeForHealth,
 }

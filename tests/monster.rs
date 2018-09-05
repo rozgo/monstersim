@@ -1,11 +1,12 @@
 extern crate monstersim;
 
-use monstersim::*;
-use asset::*;
 use account::*;
-use rate::*;
+use asset::*;
 use monster::*;
-use std::time::{Instant};
+use monstersim::*;
+use rate::*;
+use std::collections::HashMap;
+use std::time::Instant;
 
 fn house_default() -> Account {
     Account(hashmap![
@@ -24,8 +25,9 @@ fn monster_default() -> Account {
     ])
 }
 
-fn rates_default() -> Vec<Rate> {
-    vec![
+fn rates_default() -> HashMap<Exchange, Rate> {
+    hashmap![
+        Exchange::LifeTimeForState =>
         Rate {
             credit: hashmap![Asset::LifeTime => Quantity(1)],
             debit: hashmap![
@@ -34,6 +36,7 @@ fn rates_default() -> Vec<Rate> {
                 Asset::State(State::Cleanliness) => Quantity(1),
             ],
         },
+        Exchange::LifeTimeForHealth =>
         Rate {
             credit: hashmap![Asset::LifeTime => Quantity(1)],
             debit: hashmap![Asset::State(State::Health) => Quantity(1)],
@@ -43,7 +46,6 @@ fn rates_default() -> Vec<Rate> {
 
 #[test]
 fn monster_lifetime_until_death() {
-
     let house = house_default();
     let rates = rates_default();
 
@@ -52,9 +54,19 @@ fn monster_lifetime_until_death() {
         is_alive: true,
     };
 
-    // while monster.is_alive {
-    //     monster.simulate(&rates, &house);
-    // }
+    while monster.is_alive {
+        monster.simulate(&rates, &house);
+    }
+
+    let Quantity(total_secs) = monster.account.map().get(&Asset::LifeTime).unwrap().clone();
+
+    let hours = (total_secs / 60) / 60;
+    let mins = (total_secs - hours * 60 * 60) / 60;
+    let secs = total_secs - (hours * 60 * 60 + mins * 60);
 
     // println!("{:#?}", monster.account);
+    println!(
+        "RIP! Monster was alive for {} hours, {} minutes and {} seconds.",
+        hours, mins, secs
+    );
 }

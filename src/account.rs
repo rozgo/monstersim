@@ -1,7 +1,7 @@
 use asset::*;
 use rate::*;
-use std::ops;
 use std::collections::HashMap;
+use std::ops;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Clone, Copy)]
 pub struct Quantity(pub i32);
@@ -9,17 +9,41 @@ pub struct Quantity(pub i32);
 #[derive(Debug, Clone)]
 pub struct Account(pub HashMap<Asset, Quantity>);
 
-impl Account {
+pub enum Tranx {
+    Approved(Account, Account),
+    Denied(HashMap<Asset, Quantity>),
+}
 
+impl Account {
     pub fn map(&self) -> &HashMap<Asset, Quantity> {
         let Account(map) = self;
         map
     }
 
-    pub fn exchange(rate: &Rate, quantity: Quantity, buyer: &Account, seller: &Account) -> (Account, Account) {
+    pub fn exchange(rate: &Rate, quantity: Quantity, buyer: &Account, seller: &Account) -> Tranx {
         let credit = &Account(rate.credit.clone()) * quantity;
         let debit = &Account(rate.debit.clone()) * quantity;
-        (&(buyer - &debit) + &credit, &(seller - &credit) + &debit)
+        let (buyer, seller) = (&(buyer - &debit) + &credit, &(seller - &credit) + &debit);
+        let mut success = true;
+        let mut deficit = hashmap![];
+        {
+            let Account(buyer) = &buyer;
+            let Account(debit) = debit;
+            for asset in debit.keys() {
+                match buyer.get(asset) {
+                    Some(Quantity(quantity)) if *quantity < 0 => {
+                        success = false;
+                        deficit.insert(asset.clone(), Quantity(*quantity));
+                    }
+                    _ => (),
+                }
+            }
+        }
+        if success {
+            Tranx::Approved(buyer, seller)
+        } else {
+            Tranx::Denied(deficit)
+        }
     }
 
     pub fn prime(&mut self, rhs: &Account) {
@@ -97,5 +121,3 @@ impl<'a> ops::Mul<Quantity> for &'a Account {
         Account(lhs)
     }
 }
-
-

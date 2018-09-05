@@ -1,9 +1,10 @@
 extern crate monstersim;
 
-use monstersim::*;
-use asset::*;
 use account::*;
+use asset::*;
+use monstersim::*;
 use rate::*;
+use std::collections::HashMap;
 
 fn house_default() -> Account {
     Account(hashmap![
@@ -20,8 +21,9 @@ fn monster_default() -> Account {
     ])
 }
 
-fn rates_default() -> Vec<Rate> {
-    vec![
+fn rates_default() -> HashMap<Exchange, Rate> {
+    hashmap![
+        Exchange::LifeTimeForState =>
         Rate {
             credit: hashmap![Asset::LifeTime => Quantity(1)],
             debit: hashmap![
@@ -29,26 +31,6 @@ fn rates_default() -> Vec<Rate> {
                 Asset::State(State::Hunger) => Quantity(3),
                 Asset::State(State::Cleanliness) => Quantity(1),
             ],
-        },
-        Rate {
-            credit: hashmap![Asset::LifeTime => Quantity(1)],
-            debit: hashmap![Asset::State(State::Health) => Quantity(1)],
-        },
-        Rate {
-            credit: hashmap![Asset::State(State::Health) => Quantity(100)],
-            debit: hashmap![Asset::Resource(Resource::FirstAid) => Quantity(1)],
-        },
-        Rate {
-            credit: hashmap![Asset::State(State::Hunger) => Quantity(100)],
-            debit: hashmap![Asset::Resource(Resource::Candy) => Quantity(1)],
-        },
-        Rate {
-            credit: hashmap![Asset::State(State::Energy) => Quantity(100)],
-            debit: hashmap![Asset::Resource(Resource::EnergyDrink) => Quantity(1)],
-        },
-        Rate {
-            credit: hashmap![Asset::State(State::Cleanliness) => Quantity(100)],
-            debit: hashmap![Asset::Resource(Resource::Soap) => Quantity(1)],
         },
     ]
 }
@@ -58,7 +40,7 @@ fn rate_buy_lifetime() {
     let house = house_default();
     let monster = monster_default();
     let rates = rates_default();
-    let (buyer, seller) = Account::exchange(&rates[0], Quantity(1), &monster, &house);
+    let rate = rates.get(&Exchange::LifeTimeForState).unwrap();
 
     let res_seller = Account(hashmap![
         Asset::LifeTime => Quantity(999999),
@@ -75,8 +57,13 @@ fn rate_buy_lifetime() {
         Asset::State(State::Cleanliness) => Quantity(9999),
     ]);
 
-    assert_eq!(res_seller, seller);
-    assert_eq!(res_buyer, buyer);
+    match Account::exchange(rate, Quantity(1), &monster, &house) {
+        Tranx::Approved(buyer, seller) => {
+            assert_eq!(res_seller, seller);
+            assert_eq!(res_buyer, buyer);
+        }
+        _ => assert!(false),
+    }
 }
 
 #[test]
@@ -84,7 +71,7 @@ fn rate_buy_lifetime_quantity() {
     let house = house_default();
     let monster = monster_default();
     let rates = rates_default();
-    let (buyer, seller) = Account::exchange(&rates[0], Quantity(2), &monster, &house);
+    let rate = rates.get(&Exchange::LifeTimeForState).unwrap();
 
     let res_seller = Account(hashmap![
         Asset::LifeTime => Quantity(999998),
@@ -101,6 +88,11 @@ fn rate_buy_lifetime_quantity() {
         Asset::State(State::Cleanliness) => Quantity(9998),
     ]);
 
-    assert_eq!(res_seller, seller);
-    assert_eq!(res_buyer, buyer);
+    match Account::exchange(rate, Quantity(2), &monster, &house) {
+        Tranx::Approved(buyer, seller) => {
+            assert_eq!(res_seller, seller);
+            assert_eq!(res_buyer, buyer);
+        }
+        _ => assert!(false),
+    }
 }
